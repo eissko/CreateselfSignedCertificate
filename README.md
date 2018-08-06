@@ -5,11 +5,11 @@ You are welcome here. This is a place where I want to share my scripts with a pu
 
 ## Scripts
 ### createSelfSignedCertificate.ps1
-This script was created in order to simplify the configuration of "Azure Point to Site VPN" where is necessary to upload PUBLIC key of CA in BASE64 format. 
+This script was created in order to simplify the configuration of "Azure Point to Site VPN" where it is necessary to upload the PUBLIC key of CA in BASE64 format.
 
 STEPS:
-1, it generates self-signed root CA, 
-2, issues the new client certificate signed by this root CA 
-3, and exports public key of this CA in BASE64 format to the terminal output
+* 1, it generates self-signed root CA,  
+* 2, issues the new client certificate signed by this root CA,
+* 3, and exports public key of this CA in BASE64 format to the terminal output.
 
 
