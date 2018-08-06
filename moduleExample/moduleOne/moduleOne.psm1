@@ -17,3 +17,5 @@ function functionOneB {
     $OutputString=$InputString
     write-output $OutputString
 }
+
+Export-ModuleMember -Function "functionOneA","functionOneB"
