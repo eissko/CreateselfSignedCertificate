@@ -60,8 +60,13 @@ function Export-RootCA{
 }
 
 function Import-RootCAtoRootStore { 
+   param(
+    [string]$path="c:\cert\",
+    [string]$RootCAFileName
+    )
+    Set-Location -Path $($path)
     #import selfSigned CA certificate into windows ROOT store under CurrentUser scope in order to ensure system trust of issued client certificates
-    Import-Certificate -FilePath $(".\$SubjectNameRoot.cer") -CertStoreLocation cert:\CurrentUser\Root
+    Import-Certificate -FilePath $(".\$RootCAFileName.cer") -CertStoreLocation cert:\CurrentUser\Root
 }
 function Issue-ClientCert {
     param(
@@ -79,13 +84,24 @@ function Issue-ClientCert {
 
 Set-StrictMode -Version 2.0
 
-
-$SubjectNameRoot="VPN Azure ROOT CA Name Surname"
-$SubjectNameClient="VPN Azure Name Surname"
+#variables
+$Name="Janko"
+$Surname="Hruska"
+$SubjectNameRoot="VPN Azure ROOT CA $Name $Surname"
+$SubjectNameClient="VPN Azure $Name $Surname"
 $RootCAFileName="VpnAzureRootCA"
 $Path="c:\cert\"
+$timestamp=get-date -Format yyyyMMddhhmmss
 
 
+#if certificates with the same name already exists in that folder just rename them
+if(test-path -Path $Path){
+
+Get-ChildItem -Path  $(join-path -Path $Path -ChildPath "*") -Include *.cer -Exclude bkp_* | rename-item -NewName {"bkp_$timestamp"+"_"+$_.name }
+
+}
+
+#check if Root CA certificate with specified subject name is already present
 $RootCa=Get-Cert -SubjectName $SubjectNameRoot | Select-Object -First 1
 
 if (-not $RootCA){
@@ -93,7 +109,7 @@ if (-not $RootCA){
     New-RootCA -SubjectNameRoot $SubjectNameRoot    
 }
 
-
+#check if Client certificate with specified subject name is already present
 $ClientCert=Get-Cert -SubjectName $SubjectNameClient | Select-Object -First 1
 
 if(-not $ClientCert){
@@ -102,9 +118,17 @@ if(-not $ClientCert){
     Issue-ClientCert -SubjectNameClient $SubjectNameClient -RootCA $RootCA
 }
 
-#$RootCaFile=(Test-Path -Path $(Join-path -Path $Path -ChildPath $($RootCAFileName+".cer")))
-
+#in this step "Root CA" should exists
 Export-RootCA -RootCaFileName $RootCAFileName -RootCA $RootCa -path $Path
 
+#check if "Root cA" is also in windows store of Trusted Root CA
+$RootCAinRootStore=Get-ChildItem -Path cert:\CurrentUser\Root | Where-Object{$_.Subject -eq "CN=$RootCAFileName"}
+if(-not $RootCAinRootStore){
+    
+    if(-not (test-path -Path  $(".\$RootCAFileName.cer"))){
+       Write-Error -Message "exported file of root CA not found. Something went wrong :)"
+       Exit
+    }
 
-
+    Import-RootCAtoRootStore -path $Path -RootCAFileName $RootCAFileName
+}
