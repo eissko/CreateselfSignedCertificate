@@ -13,5 +13,8 @@ STEPS:
 * 3, and exports public key of this CA in BASE64 format to the terminal output.
 
 TODO:
-* to finish the part of import root CA into "Trusted Root CA" in order to make it trusted by operating system
+
+
+DONE:
+* createSelfSignedCertificate.ps1 - to finish the part of import Root CA certificate into windows store of "Trusted Root Certification Authority" in order to make it trusted by operating system
 
