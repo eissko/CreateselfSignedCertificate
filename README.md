@@ -12,5 +12,6 @@ STEPS:
 * 2, issues the new client certificate signed by this root CA,
 * 3, and exports public key of this CA in BASE64 format to the terminal output.
 
-
+TODO:
+* to finish the part of import root CA into "Trusted Root CA" in order to make it trusted by operating system
 

@@ -30,8 +30,10 @@ Function Get-Cert {
 
 function Export-RootCA{
     param(
+        [string]$rootCaFileName,
         [System.Security.Cryptography.X509Certificates.X509Certificate2]$RootCA,
         [string]$path="C:\cert\"
+
     )
 
     if(-not (Test-Path($path))){
@@ -44,9 +46,11 @@ function Export-RootCA{
 
     if(-not (test-path -Path  $(".\$RootCAFileName.cer"))){
         Export-Certificate -cert $RootCA -FilePath $(".\$RootCAFileName.cer") -type P7B
-        certutil -encode $(".\$RootCAFileName.cer") $(".\$RootCAFileName.base64.cer") | Out-Null
     }
- 
+    if (-not (test-path -Path  $(".\$RootCAFileName.base64.cer")) ){
+        certutil -encode $(".\$RootCAFileName.cer") $(".\$RootCAFileName.base64.cer") | Out-Null
+        }
+     
     #output selfsigned CA certificate in a form BASE64 and remove unnecessary parts from it
     #and make it so ready for AZURE point-to-site configuration
 
@@ -93,9 +97,14 @@ if (-not $RootCA){
 $ClientCert=Get-Cert -SubjectName $SubjectNameClient | Select-Object -First 1
 
 if(-not $ClientCert){
-    write-host "Client CA not present -> creating"
-    $RootCa=Get-RootCA -SubjectNameRoot $SubjectNameRoot | Select-Object -First 1
+    write-host "client Certificate not present -> creating" -ForegroundColor Green
+    $RootCa=Get-Cert -SubjectName $SubjectNameRoot | Select-Object -First 1
     Issue-ClientCert -SubjectNameClient $SubjectNameClient -RootCA $RootCA
 }
 
-Export-RootCA -RootCA $RootCa
+#$RootCaFile=(Test-Path -Path $(Join-path -Path $Path -ChildPath $($RootCAFileName+".cer")))
+
+Export-RootCA -RootCaFileName $RootCAFileName -RootCA $RootCa -path $Path
+
+
+
