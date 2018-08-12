@@ -45,7 +45,7 @@ function Export-RootCA{
     #export-certificate do not supports BASE64 output that's why certutil
 
     if(-not (test-path -Path  $(".\$RootCAFileName.cer"))){
-        Export-Certificate -cert $RootCA -FilePath $(".\$RootCAFileName.cer") -type P7B
+        Export-Certificate -cert $RootCA -FilePath $(".\$RootCAFileName.cer") -type CERT
     }
     if (-not (test-path -Path  $(".\$RootCAFileName.base64.cer")) ){
         certutil -encode $(".\$RootCAFileName.cer") $(".\$RootCAFileName.base64.cer") | Out-Null
@@ -55,7 +55,7 @@ function Export-RootCA{
     #and make it so ready for AZURE point-to-site configuration
 
     Write-host "`n This is ROOT CA public key which needs to be copied to the azure: `n" -ForegroundColor Green
-   $($($(get-content $(".\$RootCAFileName.base64.cer") -Raw) -replace "`r`n","") -replace "-----BEGIN CERTIFICATE-----","") -replace "-----END CERTIFICATE-----",""
+   Add-Content -Path C:\cert\base64.txt -Value $($($($(get-content $(".\$RootCAFileName.base64.cer") -Raw) -replace "`r`n","") -replace "-----BEGIN CERTIFICATE-----","") -replace "-----END CERTIFICATE-----","")
 
 }
 
