@@ -54,8 +54,8 @@ function Export-RootCA{
     #output selfsigned CA certificate in a form BASE64 and remove unnecessary parts from it
     #and make it so ready for AZURE point-to-site configuration
 
-    Write-host "`n This is ROOT CA public key which needs to be copied to the azure: `n" -ForegroundColor Green
-   Add-Content -Path C:\cert\base64.txt -Value $($($($(get-content $(".\$RootCAFileName.base64.cer") -Raw) -replace "`r`n","") -replace "-----BEGIN CERTIFICATE-----","") -replace "-----END CERTIFICATE-----","")
+    #Write-host "`n This is ROOT CA public key which needs to be copied to the azure: `n" -ForegroundColor Green
+    Set-Content -Path .\base64.txt -NoNewline -Value $($($($(get-content $(".\$RootCAFileName.base64.cer") -Raw) -replace "`r`n","") -replace "-----BEGIN CERTIFICATE-----","") -replace "-----END CERTIFICATE-----","")
 
 }
 
